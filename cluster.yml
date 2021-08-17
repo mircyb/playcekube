@@ -1,0 +1,27 @@
+---
+- name: init /etc/hosts
+  hosts: all
+  tasks:
+        - name: set /etc/hosts
+          tags: hosts
+          lineinfile:
+                path: /etc/hosts
+                line: "{{ hostvars[item].ansible_facts.default_ipv4.address }} {{ hostvars[item].inventory_hostname }}"  
+          loop: "{{ play_hosts }}"
+
+- name: init master server
+  hosts: localhost
+  pre_tasks:
+        - name: set hostname
+          hostname:
+                name: master.oscrhcsa8.lab
+  roles:
+        - rhcsa.lab.master
+
+- name: init client
+  hosts: client.oscrhcsa8.lab
+  tags:
+        - client
+  roles:
+        - rhcsa.lab.server
+...
